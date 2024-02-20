@@ -1,0 +1,88 @@
+{
+    "Mon": {
+        "Date":"2024-02-19",
+      "Ch": [
+        "牛蒡萝卜汤",
+        "冬菇薯仔闷鸡",
+        "鱼豆腐炒杏鲍菇",
+        "时菜",
+        "香干肉丝"
+      ],
+      "En": [
+        "Burdock, Green Radish, Carrot and Turnip Soup",
+        "Braise chicken w/ Chinese mushroom &potato",
+        "Stir Fried King Oyster Mushroom w/ Fish Tofu",
+        "Seasonal Vegetable",
+        "Pork w/Dried Bean Curd"
+      ]
+    },
+    "Tue": {
+        "Date":"2024-02-20",
+      "Ch": [
+        "牛蒡萝卜汤",
+        "冬菇薯仔闷鸡",
+        "鱼豆腐炒杏鲍菇",
+        "时菜",
+        "香干肉丝"
+      ],
+      "En": [
+        "Burdock, Green Radish, Carrot and Turnip Soup",
+        "Braise chicken w/ Chinese mushroom &potato",
+        "Stir Fried King Oyster Mushroom w/ Fish Tofu",
+        "Seasonal Vegetable",
+        "Pork w/Dried Bean Curd"
+      ]
+    },
+    "Wed": {
+        "Date":"2024-02-21",
+      "Ch": [
+        "木瓜眉豆汤",
+        "酱烧排骨",
+        "百花蒸釀豆付",
+        "时菜",
+        "番茄炒蛋"
+      ],
+      "En": [
+        "Papaya & Black Eye Bean Soup",
+        "Braised Pork Rib in Brown Sauce",
+        "Steamed Styffed Tofu w/ SHrimp & Pork Paste",
+        "Seasonal Vegetable",
+        "Tomato Scrambled Eggs"
+      ]
+    },
+    "Thu": {
+        "Date":"2024-02-22",
+      "Ch": [
+        "花旗参杞子汤",
+        "红烧肉丸",
+        "香煎金锠鱼",
+        "时菜",
+        "蜜汁鸡块"
+      ],
+      "En": [
+        "Ginseng w/ Polygonatum & Barley Soup",
+        "Braised Meat Ball",
+        "Pan Fried Golden Ponpano",
+        "Seasonal Vegatables",
+        "Honey Chicken"
+      ]
+    },
+    "Fri": {
+        "Date":"2024-02-23",
+      "Ch": [
+        "南北杏西凉菜汤",
+        "盐焗鸡",
+        "白灼蒜蓉虾",
+        "时菜",
+        "什锦肉丁"
+      ],
+      "En": [
+        "Watercress, Fig & Almond Soup",
+        "Salt Baked Chicken",
+        "Shrimp w/ Garlic Sauce",
+        "Seasonal Vegetable",
+        "Stir Fried Mixed Vegetable w/ Pork"
+      ]
+    }
+  }
+  
