@@ -5,6 +5,15 @@ function Menu() {
   const [editMode, setEditMode] = useState(false);
   const [menuData, setMenuData] = useState(data); // Use state to hold and manage the editable menu data
 
+  const dayToCh = {
+    Mon: "星期一",
+    Tue: "星期二",
+    Wed: "星期三",
+    Thu: "星期四",
+    Fri: "星期五"
+  };
+  
+
   const handleEditToggle = () => {
     setEditMode(!editMode);
   };
@@ -34,15 +43,15 @@ function Menu() {
     <div>
       <div className="bg-green-500 w-full h-16 flex items-center justify-center">
         <p className="text-white tracking-widest text-2xl font-extrabold">每週菜單/WEEKLY MENU</p>
-        <button onClick={handleEditToggle} className="bg-green-800 hover:bg-green-700 text-white font-bold py-2 px-4 ml-3 rounded-full">
+        {/* <button onClick={handleEditToggle} className="bg-green-800 hover:bg-green-700 text-white font-bold py-2 px-4 ml-3 rounded-full">
           {editMode ? 'Save Changes' : '编辑'}
-        </button>
+        </button> */}
       </div>
 
       <div className='flex flex-row mx-10 my-5 text-center'>
         {Object.entries(menuData).map(([day, { Date, Ch, En }]) => (
           <div key={day} className='basis-1/5 flex flex-col gap-y-4 border-l-2'>
-            <div className='text-2xl tracking-widest font-extrabold w-full'>{day}</div>
+            <div className='text-2xl tracking-widest font-extrabold w-full'>{day} {dayToCh[day]}</div>
             <div className='text-lg tracking-widest font-bold'>{Date}</div>
             {editMode ? (
               <>
