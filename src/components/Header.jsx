@@ -12,7 +12,7 @@ const Header = () => {
             <img
               src={logoImage}
               alt="Fitrition Kitchen"
-              className="h-12 md:h-18 w-auto"
+              className="h-12 md:h-19 w-auto"
             />
             <p className="text-sm md:text-lg ml-2 md:mt-0 font-extrabold text-gray-400 tracking-widest uppercase">
               HEALTHY CHOICE FOR ASIAN FOOD
