@@ -10,7 +10,7 @@ function App() {
   return (
     <BrowserRouter>
       <Header />
-      {/* <Announcement /> */}
+      <Announcement />
       <Menu />
       <br></br>
       <Footer />
