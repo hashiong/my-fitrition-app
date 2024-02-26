@@ -50,7 +50,7 @@ function Menu() {
 
             <div className="flex flex-col lg:flex-row mx-4 lg:mx-10 my-5 text-center">
                 {Object.entries(menuData).map(([day, { Date, Ch, En }]) => (
-                    <div key={day} className="flex-1 mx-auto lg:mx-0 mb-8 lg:mb-0 border-b-2 md:border-l-2 md:basis-1/5 w-full">
+                    <div key={day} className="flex-1 mx-auto lg:mx-0 mb-8 lg:mb-0 border-b-2 md:border-l-2 md:border-b-0 md:basis-1/5 w-full">
                         <div className="text-2xl tracking-widest font-extrabold w-full">{day} {dayToCh[day]}</div>
                         <div className="text-lg tracking-widest font-bold">{Date}</div>
                         {editMode ? (
