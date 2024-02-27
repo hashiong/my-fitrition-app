@@ -49,12 +49,6 @@ const Header = () => {
               626-300-8068
             </a>
             <a
-              href="tel:+16267894388"
-              className="flex items-center text-lg md:text-xl font-bold text-green-600 hover:text-green-400 mr-4"
-            >
-              626-789-4388
-            </a>
-            <a
               href="tel:+16267081018"
               className="flex items-center text-lg md:text-xl font-bold text-green-600 hover:text-green-400"
             >

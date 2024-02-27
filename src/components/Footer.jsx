@@ -22,10 +22,6 @@ function Footer() {
                                 626-300-8068
                             </a>
                             <span className="mx-2 text-white">|</span>
-                            <a href="tel:+16267894388" className="text-xl font-bold text-white hover:text-green-100">
-                                626-789-4388
-                            </a>
-                            <span className="mx-2 text-white">|</span>
                             <a href="tel:+16267081018" className="text-xl font-bold text-white hover:text-green-100">
                                 626-708-1018
                             </a>
@@ -37,8 +33,8 @@ function Footer() {
                             STORE HOURS
                         </div>
                         <div className="text-white text-base font-medium">
-                            <div className="mb-2">Monday - Thursday<br />11:00am - 7:30pm</div>
-                            <div>Friday<br />1:00pm - 6:30pm</div>
+                            <div className="mb-2">Monday - Thursday<br />11:00am - 6:30pm</div>
+                            <div>Friday<br />1:00pm - 6:00pm</div>
                         </div>
                     </div>
                 </div>
