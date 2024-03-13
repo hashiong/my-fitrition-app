@@ -1,5 +1,5 @@
 import React from "react";
-import phoneImage from "../assets/phone-white.png";
+import phoneImage from "../../assets/phone-white.png";
 
 function Footer() {
     return (

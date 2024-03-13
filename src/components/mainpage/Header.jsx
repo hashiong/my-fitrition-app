@@ -1,6 +1,6 @@
 import React from "react";
-import logoImage from "../assets/logo.png";
-import phoneImage from "../assets/phone.png";
+import logoImage from "../../assets/logo.png";
+import phoneImage from "../../assets/phone.png";
 
 const Header = () => {
   return (

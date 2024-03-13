@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import data from "../data/test.json"; // Assuming this imports correctly and contains the menu data
+import data from "../../data/test.json"; // Assuming this imports correctly and contains the menu data
 
 function Menu() {
     const [editMode, setEditMode] = useState(false);
