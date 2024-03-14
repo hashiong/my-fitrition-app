@@ -25,7 +25,6 @@ const MenuForm = () => {
     reader.onload = async (e) => {
       const text = e.target.result;
       const data = JSON.parse(text);
-
       try {
         const collectionRef = collection(db, "menuItems");
         for (const item of data) {
@@ -36,6 +35,7 @@ const MenuForm = () => {
         console.error("Error adding document: ", error);
         alert('Error uploading data!');
       }
+    
     };
     reader.readAsText(file);
   };

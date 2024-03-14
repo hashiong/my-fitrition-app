@@ -5,6 +5,7 @@ import { FirebaseContext } from '../../contexts/FirebaseContext';
 const MenuList = () => {
   const [items, setItems] = useState([]);
   const { db } = useContext(FirebaseContext);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -12,7 +13,8 @@ const MenuList = () => {
       const itemsList = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      }));
+      })).sort((a, b) => a.ItemID - b.ItemID);
+      console.log(itemsList)
       setItems(itemsList);
     };
 
@@ -26,13 +28,26 @@ const MenuList = () => {
 
   return (
     <div className="space-y-4">
-      {items.map((item) => (
-        <div key={item.id} className="p-4 bg-white shadow-lg rounded-lg flex justify-between items-center">
-          <div>
-            <p className="text-lg font-semibold">{item.EnDescription} ({item.ChnDescription})</p>
-            <p>Category: {item.Category}</p>
-            {/* Add other details you want to display */}
-          </div>
+      <input
+        type="text"
+        placeholder="Search items..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="mb-4 w-full p-2 border rounded"
+      />
+      {items
+        .filter(item =>
+          item.EnDescription.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.ChnDescription.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.ItemID.toString().includes(searchQuery)
+        ).map((item) => (
+        <div key={item.id} className="p-4 mb-2 w-full bg-gray-100 rounded-lg shadow flex justify-between items-center">
+    
+    <div className="">
+      <p className="text-sm font-semibold text-gray-700">Item ID: {item.ItemID}</p>
+      <p className="text-lg font-bold text-gray-900">{item.ChnDescription} ({item.EnDescription})</p>
+      <p className="text-sm text-gray-600">Category: {item.Category}</p>
+    </div>
           <button
             onClick={() => handleDelete(item.id)}
             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
