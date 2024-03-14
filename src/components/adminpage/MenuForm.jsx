@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, addDoc, collection } from 'firebase/firestore';
 import { FirebaseContext } from '../../contexts/FirebaseContext';
 
 const MenuForm = () => {
@@ -8,6 +8,37 @@ const MenuForm = () => {
   const [chnDescription, setChnDescription] = useState('');
   const [category, setCategory] = useState('');
   const { db } = useContext(FirebaseContext);
+
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
+
+  const uploadData = async () => {
+    if (!file) {
+      alert('Please select a file first!');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const text = e.target.result;
+      const data = JSON.parse(text);
+
+      try {
+        const collectionRef = collection(db, "menuItems");
+        for (const item of data) {
+          await addDoc(collectionRef, item);
+        }
+        alert('Data uploaded successfully!');
+      } catch (error) {
+        console.error("Error adding document: ", error);
+        alert('Error uploading data!');
+      }
+    };
+    reader.readAsText(file);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,6 +58,7 @@ const MenuForm = () => {
   };
 
   return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
     <form onSubmit={handleSubmit} className="form space-y-4">
       <div>
         <label htmlFor="itemID" className="block text-sm font-medium text-gray-700">Item ID</label>
@@ -80,6 +112,11 @@ const MenuForm = () => {
         Save Item
       </button>
     </form>
+    <div>
+      <input type="file" onChange={handleFileChange} />
+      <button onClick={uploadData}>Upload Data</button>
+    </div>
+    </div>
   );
 };
 
