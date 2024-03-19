@@ -11,6 +11,9 @@ const Sidebar = () => {
         <li>
           <Link to="/admin/menuform" className="block p-3 hover:bg-gray-700">Modify</Link>
         </li>
+        <li>
+          <Link to="/admin/editmenu" className="block p-3 hover:bg-gray-700">Edit</Link>
+        </li>
       </ul>
     </div>
   );
