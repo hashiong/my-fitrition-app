@@ -5,31 +5,32 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // This imports the default styling
 
 function EditMenu() {
-	const [selectedDate, setSelectedDate] = useState(new Date()); // State for the selected start date
+	const [startDate, setStartDate] = useState(new Date()); // State for the selected start date
 	const [weekDates, setWeekDates] = useState([]); // Holds the dates for the week
 	const [menuItems, setMenuItems] = useState([]);
 	const [selectedDay, setSelectedDay] = useState("Monday");
 	const [searchQuery, setSearchQuery] = useState("");
+	const [editableIndex, setEditableIndex] = useState(null);
 	const { items, setItems } = useMenuItems(); // Assuming useMenuItems is a custom hook for fetching items
 
 	useEffect(() => {
 		const startOfWeek =
-			selectedDate.getDate() -
-			selectedDate.getDay() +
-			(selectedDate.getDay() === 0 ? -6 : 1);
+		startDate.getDate() -
+		startDate.getDay() +
+			(startDate.getDay() === 0 ? -6 : 1);
 		let dates = [];
 		for (let i = 0; i < 5; i++) {
-			let date = new Date(selectedDate);
+			let date = new Date(startDate);
 			date.setDate(startOfWeek + i);
 			dates.push(date);
 		}
+		setMenuItems([])
 		setWeekDates(dates);
-	}, [selectedDate]);
+	}, [startDate]);
 
 	const handleAddMenuItem = () => {
 		// Add a new "searchable" placeholder item to the menuItems state
 		setMenuItems([...menuItems, { isSearchable: true }]);
-		console.log(menuItems);
 		setSearchQuery("");
 	};
 
@@ -38,9 +39,13 @@ function EditMenu() {
 	};
 
 	const handleMenuItemChange = (index, value) => {
-		// Directly search the item list (assuming search logic is implemented elsewhere or items are pre-fetched)
 		setSearchQuery(value);
 	};
+	
+	const handleInputBoxSelect = (index) => {
+		console.log("index: " + index)
+		setEditableIndex(index);
+    };
 
 	const handleSaveChanges = () => {
 		const updatedMenuItems = menuItems.map((item, index) => {
@@ -65,24 +70,29 @@ function EditMenu() {
 
 	// Correctly implement handleAdd to accept an item and replace the first searchable item
 	const handleAdd = (selectedItem) => {
-		const updatedMenuItems = menuItems.map((menuItem) =>
-			menuItem.isSearchable
-				? { ...selectedItem, isSearchable: false }
-				: menuItem
-		);
+
+		const updatedMenuItems = menuItems.map((menuItem, index) =>
+            index === editableIndex
+                ? { ...selectedItem, isEditable: false }
+                : menuItem
+        );
 		setMenuItems(updatedMenuItems);
+		setSearchQuery("");
+        setEditableIndex(null);
 	};
 
 	// console.log(items);
 
 	return (
-		<div className="p-8 font-smibold">
-			Start Date:{" "}
-			<DatePicker
-				selected={selectedDate}
-				onChange={(date) => setSelectedDate(date)}
-				className="text-center text-md datePickerInput flex-1 px-4 py-2 rounded bg-gray-200 text-gray-700"
-			/>
+		<div className="p-8 font-semibold">
+            <div className="flex items-center mb-4">
+                <label className="mr-2">Start Date:</label>
+                <DatePicker
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                    className="text-center text-md datePickerInput flex-1 px-4 py-2 rounded bg-gray-200 text-gray-700"
+                />
+            </div>
 			<div className="flex space-x-4 mt-4">
 				{weekDates.map((date, index) => (
 					<div
@@ -129,12 +139,15 @@ function EditMenu() {
 											<input
 												type="text"
 												placeholder="Search for an item..."
-												onChange={(e) =>
-													handleMenuItemChange(index, e.target.value)
-												}
+					
+												value={index === editableIndex ? searchQuery : ""}
+                                                onChange={(e) =>
+                                                    handleMenuItemChange(index, e.target.value)
+                                                }
+												onClick={() => handleInputBoxSelect(index)}
 												className="w-full"
 											/>
-											{items
+											{index === editableIndex && items
 												.filter(
 													(item) =>
 														searchQuery !== "" &&

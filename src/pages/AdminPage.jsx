@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Navigate, Routes, Route } from "react-router-dom";
 import Sidebar from "../components/adminpage/SideBar";
 import { FirebaseProvider } from "../contexts/FirebaseContext";
 import { MenuItemsProvider } from "../contexts/MenuItemsContext";
@@ -21,6 +21,7 @@ function AdminPage() {
 						<Route path="/menuform" element={<MenuForm />} />
 						<Route path="/menulist" element={<MenuList />} />
 						<Route path="/editmenu" element={<EditMenu />} />
+						<Route path="*" element={<Navigate replace to="/admin/menulist" />} />
 					</Routes>
 
 				</div>
