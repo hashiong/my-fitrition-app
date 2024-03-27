@@ -1,4 +1,3 @@
-import React from "react";
 import { Navigate, Routes, Route } from "react-router-dom";
 import Sidebar from "../components/adminpage/SideBar";
 import { FirebaseProvider } from "../contexts/FirebaseContext";
@@ -12,7 +11,7 @@ function AdminPage() {
     <FirebaseProvider>
 		<MenuItemsProvider>
 			<div className="flex min-h-screen">
-				<div className="w-32 p-10 bg-gray-200"> {/* Adjusted: Removed flex-1 and added background color for visibility */}
+				<div className="md:w-32 md:p-10 bg-gray-200"> {/* Adjusted: Removed flex-1 and added background color for visibility */}
 					<Sidebar />
 				</div>
 				<div className="flex-grow p-10"> {/* Adjusted: Changed from w-64 to flex-grow */}

@@ -1,4 +1,3 @@
-import React from "react";
 import Header from "../components/mainpage/Header";
 import Menu from "../components/mainpage/Menu";
 import Footer from "../components/mainpage/Footer";
