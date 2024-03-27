@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { FirebaseContext } from "../../contexts/FirebaseContext";
 import { useMenuItems } from "../../contexts/MenuItemsContext";
-import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
+import { doc, setDoc, collection, query, getDocs, where, getDoc, updateDoc } from "firebase/firestore"; // Import Firestore functions
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // This imports the default styling
 
@@ -14,13 +14,39 @@ function EditMenu() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [editableIndex, setEditableIndex] = useState(null);
 	const { items, setItems } = useMenuItems(); // Assuming useMenuItems is a custom hook for fetching items
+	// const [menuData, setMenuData] = useState([]);
 
 	useEffect(() => {
+		if (weekDates.length > 0) { // Make sure weekDates is not empty
+			const dateForSelectedDay = mapDayToDate(selectedDay);
+			if (dateForSelectedDay) {
+				setMenuItems([]);
+				fetchMenuData(dateForSelectedDay).then(data => {
+					// Check if data is not null and has at least one item
+					if (data && data.length > 0 && data[0].menuItems) {
+						setMenuItems(data[0].menuItems);
+						console.log("Fetched Menu Data: ", data[0].menuItems);
+					} else {
+						// Handle the case where there are no menu items or data is null
+						setMenuItems([]);
+						console.log("No menu data available for this date");
+					}
+				});
+			}
+		}
+	}, [selectedDay, weekDates]);
+
+	useEffect(() => {
+
+		console.log("startdate: " + startDate)
 		const startOfWeek =
 			startDate.getDate() -
 			startDate.getDay() +
 			(startDate.getDay() === 0 ? -6 : 1);
+
+		console.log("startdat: " + startDate.getDay())
 		let dates = [];
+		
 		for (let i = 0; i < 5; i++) {
 			let date = new Date(startDate);
 			date.setDate(startOfWeek + i);
@@ -28,7 +54,47 @@ function EditMenu() {
 		}
 		setMenuItems([]);
 		setWeekDates(dates);
+		console.log("week dates: " + weekDates)
 	}, [startDate]);
+
+	async function fetchMenuData(date) {
+		// Ensure 'db' is your initialized Firestore instance
+		const q = query(
+			collection(db, "scheduledMenus"),
+			where("date", "==", date)
+		);
+
+		try {
+			const querySnapshot = await getDocs(q);
+			const menuData = [];
+			querySnapshot.forEach((doc) => {
+				// doc.data() is never undefined for query doc snapshots
+				console.log(doc.id, " => ", doc.data());
+				menuData.push(doc.data());
+			});
+			// Now you have your menuData, you can set it to state or return it
+			return menuData;
+		} catch (error) {
+			console.error("Error fetching menu data: ", error);
+			return []; // Return an empty array or handle the error as needed
+		}
+	}
+
+	const fetchItems = async () => {
+		const querySnapshot = await getDocs(collection(db, "menuItems"));
+		const itemsList = querySnapshot.docs
+			.map((doc) => ({
+				id: doc.id,
+				...doc.data(),
+			}))
+			.sort((a, b) => a.ItemID - b.ItemID);
+		setItems(itemsList);
+	};
+
+	if(items.length === 0){
+		fetchItems();
+	}
+	
 
 	const handleAddMenuItem = () => {
 		// Add a new "searchable" placeholder item to the menuItems state
@@ -47,9 +113,67 @@ function EditMenu() {
 		return date ? date.toISOString().split("T")[0] : null;
 	};
 
-	const handleRemoveMenuItem = (index) => {
-		setMenuItems(menuItems.filter((_, i) => i !== index));
+	const handleRemoveMenuItem = async (indexToRemove) => {
+		const date = mapDayToDate(selectedDay); // Ensuring the date format is correct
+		if (!date) return; // Guard clause if date is not valid
+	
+		const docRef = doc(db, "scheduledMenus", date);
+		
+		try {
+			// First, get the current document to work with the latest menuItems
+			const docSnap = await getDoc(docRef);
+			if (docSnap.exists()) {
+				const currentMenuItems = docSnap.data().menuItems;
+				const updatedMenuItems = currentMenuItems.filter((_, i) => i !== indexToRemove);
+				
+				// Update the document with the new menuItems array
+				await updateDoc(docRef, {
+					menuItems: updatedMenuItems
+				});
+	
+				// Then, update the local state to reflect this change
+				setMenuItems(updatedMenuItems);
+				console.log("Updated menuItems after removal:", updatedMenuItems);
+			} else {
+				console.log("Document does not exist!");
+			}
+		} catch (error) {
+			console.error("Error updating document: ", error);
+		}
 	};
+	
+
+	// const handleRemoveMenuItem = async(indexToRemove) => {
+	// 	const date = mapDayToDate(selectedDay); // Assuming mapDayToDate returns the date in the required format
+	// 	if (!date) return; // Guard clause if date is not valid
+
+	// 	const docRef = doc(db, "scheduledMenus", date);
+		
+	// 	try {
+	// 		const isNotEmpty = (obj) => Object.keys(obj).length > 0;
+	// 		await deleteDoc(docRef);
+	// 		console.log("Document successfully deleted!");
+	// 		console.log("indexToRemove: " + indexToRemove);
+	// 		const updatedMenuItems = menuItems.filter((_, i) => i !== indexToRemove)
+	// 		setMenuItems(updatedMenuItems);
+	// 		console.log("menuItems: " + menuItems);
+
+	// 		const menuData = {
+	// 			date: date,
+	
+	// 			menuItems: menuItems
+	// 				.filter(isNotEmpty), // Optionally clean up menuItems before saving
+	// 		};
+	// 		await setDoc(docRef, menuData); // Save the data to Firestore
+	// 		console.log("Menu saved successfully for date:", date);
+	// 	} catch (error) {
+	// 		console.error("Error removing document: ", error);
+	// 	}
+
+
+
+		
+	// };
 
 	const handleMenuItemChange = (index, value) => {
 		setSearchQuery(value);
@@ -62,14 +186,18 @@ function EditMenu() {
 
 	const handleSaveChanges = async () => {
 		const date = mapDayToDate(selectedDay); // Format the date as YYYY-MM-DD
-
+		console.log("savedate: ", date)
 		// Create a reference to the document location you want to write to
 		const docRef = doc(db, "scheduledMenus", date);
 
+		const isNotEmpty = (obj) => Object.keys(obj).length > 0;
 		// Data structure to save
 		const menuData = {
 			date: date,
-			menuItems: menuItems.map(({ isEditable, ...keepAttrs }) => keepAttrs), // Optionally clean up menuItems before saving
+
+			menuItems: menuItems
+				.map(({ isEditable, ...keepAttrs }) => keepAttrs)
+				.filter(isNotEmpty), // Optionally clean up menuItems before saving
 		};
 
 		try {
