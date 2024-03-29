@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { signOut } = useAuth();
+
+
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
@@ -35,10 +39,11 @@ const Sidebar = () => {
           <li>
             <Link to="/admin/menulist" className="block p-3 hover:bg-gray-700" onClick={closeSidebar}>Menu</Link>
           </li>
-
-
           <li>
             <Link to="/admin/editmenu" className="block p-3 hover:bg-gray-700" onClick={closeSidebar}>Edit</Link>
+          </li>
+          <li>
+            <Link to="/login" className="block p-3 hover:bg-gray-700" onClick={signOut}>Sign Out</Link>
           </li>
         </ul>
       </div>

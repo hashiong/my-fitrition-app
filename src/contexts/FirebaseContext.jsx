@@ -1,4 +1,4 @@
-import React, { createContext } from 'react';
+import { createContext } from 'react';
 import { db } from '../firebase/config';
 
 export const FirebaseContext = createContext(null);
