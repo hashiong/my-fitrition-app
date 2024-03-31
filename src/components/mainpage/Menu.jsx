@@ -6,25 +6,40 @@ function Menu() {
   const [menuData, setMenuData] = useState([]); // State for holding menu data
   const { db } = useContext(FirebaseContext); // Database context for Firestore operations
   const [weekDates, setWeekDates] = useState([]); // State for the dates in the current week
-  const [startDate, setStartDate] = useState(new Date()); // State for the selected start date
+  const [currentDate, setCurrentDate] = useState(new Date()); // State for the selected start date
 
   // Maps day abbreviations to Chinese characters
   const dayToCh = { Mon: '星期一', Tue: '星期二', Wed: '星期三', Thu: '星期四', Fri: '星期五' };
   // Maps numeric day indices to day abbreviations
   const numToDay = { 0: 'Mon', 1: 'Tue', 2: 'Wed', 3: 'Thu', 4: 'Fri' };
 
-  // Calculates and sets the week dates based on the selected start date
   useEffect(() => {
-    const startOfWeek = startDate.getDate() - startDate.getDay() + (startDate.getDay() === 0 ? -6 : 1);
+    const startOfWeek = currentDate.getDate() - currentDate.getDay() + (currentDate.getDay() === 0 ? -6 : 1);
+    const fridayDate = new Date(currentDate);
+    fridayDate.setDate(startOfWeek + 4);
+    console.log("currentdate")
     let dates = [];
-    for (let i = 0; i < 5; i++) {
-      let date = new Date(startDate);
-      date.setDate(startOfWeek + i);
-      dates.push(date.toISOString().split('T')[0]);
+    
+    // Check if the start date is before or after Friday 6:00 PM
+    if (currentDate < new Date(fridayDate.getFullYear(), fridayDate.getMonth(), fridayDate.getDate(), 18)) {
+      // If before Friday 6:00 PM, use the current week
+      for (let i = 0; i < 5; i++) {
+        let date = new Date(currentDate);
+        date.setDate(startOfWeek + i);
+        dates.push(date.toISOString().split('T')[0]);
+      }
+    } else {
+      // If after Friday 6:00 PM, use the next week
+      for (let i = 0; i < 5; i++) {
+        let date = new Date(currentDate);
+        date.setDate(startOfWeek + i + 7);
+        dates.push(date.toISOString().split('T')[0]);
+      }
     }
+
     console.log('Week dates:', dates); // Log calculated week dates for debugging
     setWeekDates(dates);
-  }, [startDate]);
+  }, [currentDate]);
 
   // Fetch menu data when weekDates changes
   useEffect(() => {
