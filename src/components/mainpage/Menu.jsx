@@ -13,11 +13,12 @@ function Menu() {
   // Maps numeric day indices to day abbreviations
   const numToDay = { 0: 'Mon', 1: 'Tue', 2: 'Wed', 3: 'Thu', 4: 'Fri' };
 
+  const pstOffset = -480;
+
   useEffect(() => {
     const startOfWeek = currentDate.getDate() - currentDate.getDay() + (currentDate.getDay() === 0 ? -6 : 1);
     const fridayDate = new Date(currentDate);
     fridayDate.setDate(startOfWeek + 4);
-    console.log("currentdate")
     let dates = [];
     
     // Check if the start date is before or after Friday 6:00 PM
@@ -33,7 +34,9 @@ function Menu() {
       for (let i = 0; i < 5; i++) {
         let date = new Date(currentDate);
         date.setDate(startOfWeek + i + 7);
-        dates.push(date.toISOString().split('T')[0]);
+        date.setTime(date.getTime() - 7)
+        let timezoneDate = convertToTimezone(date, pstOffset);
+        dates.push(timezoneDate.toISOString().split('T')[0]);
       }
     }
 
@@ -71,6 +74,12 @@ function Menu() {
       console.error('Error fetching menu data for date', date, ':', error);
       return [];
     }
+  }
+
+  function convertToTimezone(date, timeZoneOffset) {
+    const offsetInMilliseconds = timeZoneOffset * 60 * 1000;
+    const timezoneDate = new Date(date.getTime() + offsetInMilliseconds);
+    return timezoneDate;
   }
 
   // Render the menu UI
