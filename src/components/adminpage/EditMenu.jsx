@@ -65,6 +65,8 @@ function EditMenu() {
 			.catch((error) => console.error("Error fetching menu data:", error));
 	}, [selectedDate]);
 
+
+
 	const fetchMenuData = async (date) => {
 		const q = query(
 			collection(db, "scheduledMenus"),
@@ -99,31 +101,37 @@ function EditMenu() {
 
 	const handleFormSubmit = async (event) => {
 		event.preventDefault();
-	
+
 		// Map for efficient item lookup by ID.
-		const itemsMap = new Map(items.map(item => [item.ItemID.toString(), item]));
-	
+		const itemsMap = new Map(
+			items.map((item) => [item.ItemID.toString(), item])
+		);
+
 		const newDayMenuSelections = dayMenuSelections.map((dayMenu, index) => {
 			const date = moment(weekDates[index])
 				.tz("America/Los_Angeles")
 				.format("YYYY-MM-DD");
 			const menuItems = dayMenu
-				.map(selectionId => selectionId ? itemsMap.get(selectionId) : null)
-				.filter(item => item !== null);
-	
+				.map((selectionId) => (selectionId ? itemsMap.get(selectionId) : null))
+				.filter((item) => item !== null);
+
 			return { date, menuItems };
 		});
-	
+
 		// Prepare all Firestore write operations.
-		const firestoreWrites = newDayMenuSelections.map(({ date, menuItems }, i) => {
-			const docRef = doc(db, "scheduledMenus", date);
-			const payload = dayDisabled[i] ? {date:date, menuItems: [] } : {date:date, menuItems };
-	
-			return setDoc(docRef, payload).catch(error => {
-				console.error(`Error saving menu for ${date}:`, error);
-			});
-		});
-	
+		const firestoreWrites = newDayMenuSelections.map(
+			({ date, menuItems }, i) => {
+				const docRef = doc(db, "scheduledMenus", date);
+				const payload = dayDisabled[i]
+					? { date: date, menuItems: [] }
+					: { date: date, menuItems };
+
+				return setDoc(docRef, payload).catch((error) => {
+					console.error(`Error saving menu for ${date}:`, error);
+				});
+			}
+		);
+
 		// Execute all writes concurrently.
 		try {
 			await Promise.all(firestoreWrites);
@@ -131,7 +139,6 @@ function EditMenu() {
 			console.error("Error in batch saving menus:", error);
 		}
 	};
-	
 
 	return (
 		<div className="p-8 font-semibold sm:p-4">
@@ -161,86 +168,89 @@ function EditMenu() {
 										onChange={() => handleDayDisabledChange(index)}
 										className="mr-2"
 									/>
-									Disable Day
+									Disable Menu
 								</div>
 							</div>
-							{dayDisabled[index] ? <div>No Menu</div>: 
-							<div className="mt-2">
-								<select
-									value={dayMenuSelections[index][0]}
-									onChange={(event) => handleDropdownChange(index, 0, event)}
-									className="block w-full mt-1"
-									required
-								>
-									<option value="">Select an Soup</option>
-									{items
-										.filter((item) => item.Category === "Soup")
-										.map((item, optionIndex) => (
-											<option key={optionIndex} value={item.ItemID}>
-												{item.ChnDescription}
-											</option>
-										))}
-								</select>
-								<select
-									value={dayMenuSelections[index][1]}
-									onChange={(event) => handleDropdownChange(index, 1, event)}
-									className="block w-full mt-1"
-									required
-								>
-									<option value="">Select an Dish</option>
-									{items
-										.filter((item) => item.Category === "Dish")
-										.map((item, optionIndex) => (
-											<option key={optionIndex} value={item.ItemID}>
-												{item.ChnDescription}
-											</option>
-										))}
-								</select>
-								<select
-									value={dayMenuSelections[index][2]}
-									onChange={(event) => handleDropdownChange(index, 2, event)}
-									className="block w-full mt-1"
-									required
-								>
-									<option value="">Select an Dish</option>
-									{items
-										.filter((item) => item.Category === "Dish")
-										.map((item, optionIndex) => (
-											<option key={optionIndex} value={item.ItemID}>
-												{item.ChnDescription}
-											</option>
-										))}
-								</select>
-								<select
-									value={dayMenuSelections[index][3]}
-									onChange={(event) => handleDropdownChange(index, 3, event)}
-									className="block w-full mt-1"
-									required
-								>
-									{items
-										.filter((item) => item.ItemID === 1)
-										.map((item, optionIndex) => (
-											<option key={optionIndex} value={item.ItemID}>
-												{item.ChnDescription}
-											</option>
-										))}
-								</select>
-								<select
-									value={dayMenuSelections[index][4]}
-									onChange={(event) => handleDropdownChange(index, 4, event)}
-									className="block w-full mt-1"
-									required
-								>
-									<option value="">Select an Dish</option>
-									{items
-										.filter((item) => item.Category === "Dish")
-										.map((item, optionIndex) => (
-											<option key={optionIndex} value={item.ItemID}>
-												{item.ChnDescription}
-											</option>
-										))}
-								</select>
-							</div>}
+							{dayDisabled[index] ? (
+								<div>No Menu</div>
+							) : (
+								<div className="mt-2">
+									<select
+										value={dayMenuSelections[index][0]}
+										onChange={(event) => handleDropdownChange(index, 0, event)}
+										className="block w-full mt-1"
+										required
+									>
+										<option value="">Select an Soup</option>
+										{items
+											.filter((item) => item.Category === "Soup")
+											.map((item, optionIndex) => (
+												<option key={optionIndex} value={item.ItemID}>
+													{item.ChnDescription}
+												</option>
+											))}
+									</select>
+									<select
+										value={dayMenuSelections[index][1]}
+										onChange={(event) => handleDropdownChange(index, 1, event)}
+										className="block w-full mt-1"
+										required
+									>
+										<option value="">Select an Dish</option>
+										{items
+											.filter((item) => item.Category === "Dish")
+											.map((item, optionIndex) => (
+												<option key={optionIndex} value={item.ItemID}>
+													{item.ChnDescription}
+												</option>
+											))}
+									</select>
+									<select
+										value={dayMenuSelections[index][2]}
+										onChange={(event) => handleDropdownChange(index, 2, event)}
+										className="block w-full mt-1"
+										required
+									>
+										<option value="">Select an Dish</option>
+										{items
+											.filter((item) => item.Category === "Dish")
+											.map((item, optionIndex) => (
+												<option key={optionIndex} value={item.ItemID}>
+													{item.ChnDescription}
+												</option>
+											))}
+									</select>
+									<select
+										value={dayMenuSelections[index][3]}
+										onChange={(event) => handleDropdownChange(index, 3, event)}
+										className="block w-full mt-1"
+										required
+									>
+										{items
+											.filter((item) => item.ItemID === 1)
+											.map((item, optionIndex) => (
+												<option key={optionIndex} value={item.ItemID}>
+													{item.ChnDescription}
+												</option>
+											))}
+									</select>
+									<select
+										value={dayMenuSelections[index][4]}
+										onChange={(event) => handleDropdownChange(index, 4, event)}
+										className="block w-full mt-1"
+										required
+									>
+										<option value="">Select an Dish</option>
+										{items
+											.filter((item) => item.Category === "Dish")
+											.map((item, optionIndex) => (
+												<option key={optionIndex} value={item.ItemID}>
+													{item.ChnDescription}
+												</option>
+											))}
+									</select>
+								</div>
+							)}
 						</div>
 					))}
 					<button
