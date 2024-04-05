@@ -9,23 +9,21 @@ import {
 	query,
 	getDocs,
 	where,
-	getDoc,
-	updateDoc,
 } from "firebase/firestore";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 function EditMenu() {
-	const [startDate, setStartDate] = useState(new Date());
+	const [selectedDate, setSelectedDate] = useState(new Date());
 	const [weekDates, setWeekDates] = useState([]);
-	const [menuItems, setMenuItems] = useState([]);
-	const [selections, setSelections] = useState([]);
+	const [dayMenuSelections, setDayMenuSelections] = useState([]);
 	const { db } = useContext(FirebaseContext);
+	const [dayDisabled, setDayDisabled] = useState(Array(5).fill(false));
 	const { items, setItems } = useMenuItems();
 
-	// Fetch items only once or based on specific conditions
+	// Fetch menu items only once or based on specific conditions
 	useEffect(() => {
-		const fetchItems = async () => {
+		const fetchMenuItems = async () => {
 			const querySnapshot = await getDocs(collection(db, "menuItems"));
 			const fetchedItems = querySnapshot.docs
 				.map((doc) => ({ id: doc.id, ...doc.data() }))
@@ -34,29 +32,28 @@ function EditMenu() {
 		};
 
 		if (!items.length) {
-			fetchItems();
+			fetchMenuItems();
 		}
 	}, [db, items.length, setItems]);
 
-	// Update weekDates and reset selections when startDate changes
+	const handleDayDisabledChange = (dayIndex) => {
+		const newDayDisabled = [...dayDisabled];
+		newDayDisabled[dayIndex] = !newDayDisabled[dayIndex];
+		setDayDisabled(newDayDisabled);
+	};
+
+	// Update weekDates and reset dayMenuSelections when selectedDate changes
 	useEffect(() => {
-		const dates = Array.from({ length: 5 }, (_, i) => {
-			const date = new Date(startDate);
+		const weekDates = Array.from({ length: 5 }, (_, i) => {
+			const date = new Date(selectedDate);
 			date.setDate(
 				date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1) + i
 			);
 			return date;
 		});
-		setWeekDates(dates);
+		setWeekDates(weekDates);
 
-		// // Update here for setting the value at index 3 to 1
-		// const initialSelections = dates.map(() => {
-		// 	let arr = Array(5).fill("");
-		// 	arr[3] = "1"; // Set the value at index 3 to 1 for each array
-		// 	return arr;
-		// });
-
-		const promises = dates.map((date) => {
+		const promises = weekDates.map((date) => {
 			const formattedDate = moment(date)
 				.tz("America/Los_Angeles")
 				.format("YYYY-MM-DD");
@@ -64,14 +61,9 @@ function EditMenu() {
 		});
 
 		Promise.all(promises)
-			.then((data) => {
-				console.log("Fetched data structure:", data); // Check the structure here
-				setSelections(data);
-			})
-			.catch((error) => {
-				console.error("Error fetching menu data:", error);
-			});
-	}, [startDate]);
+			.then((data) => setDayMenuSelections(data))
+			.catch((error) => console.error("Error fetching menu data:", error));
+	}, [selectedDate]);
 
 	const fetchMenuData = async (date) => {
 		const q = query(
@@ -87,68 +79,72 @@ function EditMenu() {
 				const existingDayMenu = doc
 					.data()
 					.menuItems.map((item) => item.ItemID.toString());
-				dayMenuData = existingDayMenu
+				dayMenuData = existingDayMenu;
 			});
-			console.log("fetching")
 			return dayMenuData;
 		} catch (error) {
 			console.error("Error fetching menu data: ", error);
-			let arr = Array(5).fill("");
-			arr[3] = "1"; // Set the value at index 3 to 1 for each array
-			return arr;
+			return Array(5)
+				.fill("")
+				.map((_, index) => (index === 3 ? "1" : ""));
 		}
 	};
 
 	const handleDropdownChange = (dayIndex, menuIndex, event) => {
-		const newSelections = [...selections];
-		newSelections[dayIndex] = [...newSelections[dayIndex]];
-		newSelections[dayIndex][menuIndex] = event.target.value;
-		setSelections(newSelections);
+		const newDayMenuSelections = [...dayMenuSelections];
+		newDayMenuSelections[dayIndex] = [...newDayMenuSelections[dayIndex]];
+		newDayMenuSelections[dayIndex][menuIndex] = event.target.value;
+		setDayMenuSelections(newDayMenuSelections);
 	};
 
 	const handleFormSubmit = async (event) => {
 		event.preventDefault();
-
-		const newSelections = selections.map((dayMenu, index) => {
+	
+		// Map for efficient item lookup by ID.
+		const itemsMap = new Map(items.map(item => [item.ItemID.toString(), item]));
+	
+		const newDayMenuSelections = dayMenuSelections.map((dayMenu, index) => {
 			const date = moment(weekDates[index])
 				.tz("America/Los_Angeles")
 				.format("YYYY-MM-DD");
 			const menuItems = dayMenu
-				.map((selectionId) => {
-					if (selectionId) {
-						return items.find((item) => item.ItemID.toString() === selectionId);
-					}
-					return null;
-				})
-				.filter((item) => item !== null);
-
+				.map(selectionId => selectionId ? itemsMap.get(selectionId) : null)
+				.filter(item => item !== null);
+	
 			return { date, menuItems };
 		});
-
-		for (let i = 0; i < newSelections.length; i++) {
-			const date = newSelections[i].date;
+	
+		// Prepare all Firestore write operations.
+		const firestoreWrites = newDayMenuSelections.map(({ date, menuItems }, i) => {
 			const docRef = doc(db, "scheduledMenus", date);
-
-			try {
-				await setDoc(docRef, newSelections[i]);
-			} catch (error) {
-				console.error("Error saving menu:", error);
-			}
+			const payload = dayDisabled[i] ? {date:date, menuItems: [] } : {date:date, menuItems };
+	
+			return setDoc(docRef, payload).catch(error => {
+				console.error(`Error saving menu for ${date}:`, error);
+			});
+		});
+	
+		// Execute all writes concurrently.
+		try {
+			await Promise.all(firestoreWrites);
+		} catch (error) {
+			console.error("Error in batch saving menus:", error);
 		}
 	};
+	
 
 	return (
 		<div className="p-8 font-semibold sm:p-4">
 			<div className="flex items-center mb-4">
 				<label className="mr-2 sm:mr-1">Start Date:</label>
 				<DatePicker
-					selected={startDate}
-					onChange={(date) => setStartDate(date)}
+					selected={selectedDate}
+					onChange={(date) => setSelectedDate(date)}
 					filterDate={(date) => date.getDay() === 1}
 					className="text-center text-md datePickerInput flex-1 px-4 py-2 rounded bg-gray-200 text-gray-700 sm:px-2 sm:py-1"
 				/>
 			</div>
-			{selections.length > 0 && (
+			{dayMenuSelections.length > 0 && (
 				<form onSubmit={handleFormSubmit} className="flex gap-4 mt-4 sm:gap-2">
 					{weekDates.map((date, index) => (
 						<div key={index} className="flex-1">
@@ -158,10 +154,20 @@ function EditMenu() {
 									month: "long",
 									day: "numeric",
 								})}
+								<div className="mt-2">
+									<input
+										type="checkbox"
+										checked={dayDisabled[index]}
+										onChange={() => handleDayDisabledChange(index)}
+										className="mr-2"
+									/>
+									Disable Day
+								</div>
 							</div>
+							{dayDisabled[index] ? <div>No Menu</div>: 
 							<div className="mt-2">
 								<select
-									value={selections[index][0]}
+									value={dayMenuSelections[index][0]}
 									onChange={(event) => handleDropdownChange(index, 0, event)}
 									className="block w-full mt-1"
 									required
@@ -176,7 +182,7 @@ function EditMenu() {
 										))}
 								</select>
 								<select
-									value={selections[index][1]}
+									value={dayMenuSelections[index][1]}
 									onChange={(event) => handleDropdownChange(index, 1, event)}
 									className="block w-full mt-1"
 									required
@@ -191,7 +197,7 @@ function EditMenu() {
 										))}
 								</select>
 								<select
-									value={selections[index][2]}
+									value={dayMenuSelections[index][2]}
 									onChange={(event) => handleDropdownChange(index, 2, event)}
 									className="block w-full mt-1"
 									required
@@ -206,7 +212,7 @@ function EditMenu() {
 										))}
 								</select>
 								<select
-									value={selections[index][3]}
+									value={dayMenuSelections[index][3]}
 									onChange={(event) => handleDropdownChange(index, 3, event)}
 									className="block w-full mt-1"
 									required
@@ -220,7 +226,7 @@ function EditMenu() {
 										))}
 								</select>
 								<select
-									value={selections[index][4]}
+									value={dayMenuSelections[index][4]}
 									onChange={(event) => handleDropdownChange(index, 4, event)}
 									className="block w-full mt-1"
 									required
@@ -234,7 +240,7 @@ function EditMenu() {
 											</option>
 										))}
 								</select>
-							</div>
+							</div>}
 						</div>
 					))}
 					<button
