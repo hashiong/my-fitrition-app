@@ -1,6 +1,8 @@
 import { useState, useContext, useEffect } from 'react';
 import { FirebaseContext } from '../../contexts/FirebaseContext';
 import {collection, query, getDocs, where} from 'firebase/firestore';
+import moment from 'moment-timezone';
+
 
 function Menu() {
   const [menuData, setMenuData] = useState([]); // State for holding menu data
@@ -27,7 +29,7 @@ function Menu() {
       for (let i = 0; i < 5; i++) {
         let date = new Date(currentDate);
         date.setDate(startOfWeek + i);
-        dates.push(date.toISOString().split('T')[0]);
+        dates.push(moment(date).tz('America/Los_Angeles').format('YYYY-MM-DD'));
       }
     } else {
       // If after Friday 6:00 PM, use the next week
@@ -35,7 +37,7 @@ function Menu() {
         let date = new Date(currentDate);
         date.setDate(startOfWeek + i + 7);
         date.setTime(date.getTime() - 7)
-        let timezoneDate = convertToTimezone(date, pstOffset);
+        let timezoneDate = moment(date).tz('America/Los_Angeles').format('YYYY-MM-DD');
         dates.push(timezoneDate.toISOString().split('T')[0]);
       }
     }
@@ -74,12 +76,6 @@ function Menu() {
       console.error('Error fetching menu data for date', date, ':', error);
       return [];
     }
-  }
-
-  function convertToTimezone(date, timeZoneOffset) {
-    const offsetInMilliseconds = timeZoneOffset * 60 * 1000;
-    const timezoneDate = new Date(date.getTime() + offsetInMilliseconds);
-    return timezoneDate;
   }
 
   // Render the menu UI

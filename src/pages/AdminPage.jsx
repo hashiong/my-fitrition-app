@@ -3,12 +3,10 @@ import { Navigate, Routes, Route } from "react-router-dom";
 import Sidebar from "../components/adminpage/SideBar";
 import MenuList from "../components/adminpage/MenuList";
 import EditMenu from "../components/adminpage/EditMenu";
-import { useContext } from "react";
 import { useAuth } from "../contexts/AuthContext";
 
 function AdminPage() {
-  const { currentUser } = useAuth();
-  console.log("currentUser: ", currentUser);
+
 
   return (
     <div className="flex min-h-screen">

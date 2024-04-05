@@ -4,7 +4,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 function RequireAuth({ children }) {
   const { currentUser } = useAuth();
   let location = useLocation();
-  console.log("current user from require: ", currentUser)
+  // console.log("current user from require: ", currentUser)
 
   if (!currentUser) {
     // Redirect the user to the login page if not authenticated
