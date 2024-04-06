@@ -36,7 +36,7 @@ function Menu() {
         date.setDate(startOfWeek + i + 7);
         date.setTime(date.getTime() - 7)
         let timezoneDate = moment(date).tz('America/Los_Angeles').format('YYYY-MM-DD');
-        dates.push(timezoneDate.toISOString().split('T')[0]);
+        dates.push(timezoneDate);
       }
     }
 
