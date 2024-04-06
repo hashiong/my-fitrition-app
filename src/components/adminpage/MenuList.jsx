@@ -51,10 +51,10 @@ const MenuList = () => {
 	const handleNewSubmit = async (event) => {
 		event.preventDefault(); // Prevent default form submission behavior
 		const formData = new FormData(event.target);
-		const EnDesc = formData.get("EnDescription") ? await translateText(formData.get("EnDescription"), "en") : "";
+		const EnDesc = formData.get("ChnDescription") ? await translateText(formData.get("ChnDescription"), "en") : "";
 
 		const newItem = {
-			ItemID: formData.get("ItemID"),
+			ItemID: Number(formData.get("ItemID")),
 			Category: formData.get("Category"),
 			ChnDescription: formData.get("ChnDescription"),
 			EnDescription: EnDesc,
@@ -73,7 +73,7 @@ const MenuList = () => {
 	const handleEditSubmit = async (event) => {
 		const formData = new FormData(event.target);
 		const updatedItem = {
-			ItemID: formData.get("ItemID"),
+			ItemID: Number(formData.get("ItemID")),
 			Category: formData.get("Category"),
 			ChnDescription: formData.get("ChnDescription"),
 			EnDescription: formData.get("EnDescription"),

@@ -3,6 +3,7 @@ import { FirebaseContext } from "../../contexts/FirebaseContext";
 import { useMenuItems } from "../../contexts/MenuItemsContext";
 import { doc, setDoc, collection, query, getDocs, where, getDoc, updateDoc } from "firebase/firestore";
 import DatePicker from "react-datepicker";
+import moment from "moment-timezone";
 import "react-datepicker/dist/react-datepicker.css";
 
 function EditMenu() {
@@ -91,7 +92,9 @@ function EditMenu() {
       return null;
     }
     const date = weekDates[index];
-    return date ? date.toISOString().split("T")[0] : null;
+    return date ? moment(date)
+    .tz("America/Los_Angeles")
+    .format("YYYY-MM-DD") : null;
   };
 
   const handleRemoveMenuItem = async (indexToRemove) => {

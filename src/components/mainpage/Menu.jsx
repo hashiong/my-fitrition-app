@@ -15,8 +15,6 @@ function Menu() {
   // Maps numeric day indices to day abbreviations
   const numToDay = { 0: 'Mon', 1: 'Tue', 2: 'Wed', 3: 'Thu', 4: 'Fri' };
 
-  const pstOffset = -480;
-
   useEffect(() => {
     const startOfWeek = currentDate.getDate() - currentDate.getDay() + (currentDate.getDay() === 0 ? -6 : 1);
     const fridayDate = new Date(currentDate);

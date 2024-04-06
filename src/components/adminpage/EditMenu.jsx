@@ -141,18 +141,18 @@ function EditMenu() {
 	};
 
 	return (
-		<div className="p-8 font-semibold sm:p-4">
-			<div className="flex items-center mb-4">
-				<label className="mr-2 sm:mr-1">Start Date:</label>
-				<DatePicker
-					selected={selectedDate}
-					onChange={(date) => setSelectedDate(date)}
-					filterDate={(date) => date.getDay() === 1}
-					className="text-center text-md datePickerInput flex-1 px-4 py-2 rounded bg-gray-200 text-gray-700 sm:px-2 sm:py-1"
-				/>
-			</div>
-			{dayMenuSelections.length > 0 && (
-				<form onSubmit={handleFormSubmit} className="flex gap-4 mt-4 sm:gap-2">
+		<div className="p-4 font-semibold md:p-8">
+      <div className="flex flex-col sm:flex-row items-center mb-4">
+        <label className="mr-2 mb-2 sm:mb-0">Start Date:</label>
+        <DatePicker
+          selected={selectedDate}
+          onChange={setSelectedDate}
+          filterDate={(date) => date.getDay() === 1}
+          className="text-center text-md flex-1 px-2 py-1 rounded bg-gray-200 text-gray-700 md:px-4 md:py-2"
+        />
+      </div>
+      {dayMenuSelections.length > 0 && (
+        <form onSubmit={handleFormSubmit} className="mt-4 flex flex-col gap-4 md:flex-row md:gap-2">
 					{weekDates.map((date, index) => (
 						<div key={index} className="flex-1">
 							<div className="px-4 py-2 rounded text-center bg-blue-500 text-white sm:px-2 sm:py-1">
@@ -183,7 +183,7 @@ function EditMenu() {
 									>
 										<option value="">Select an Soup</option>
 										{items
-											.filter((item) => item.Category === "Soup")
+											.filter((item) => item.Category === "Soup" || item.Category === "soup")
 											.map((item, optionIndex) => (
 												<option key={optionIndex} value={item.ItemID}>
 													{item.ChnDescription}
@@ -198,7 +198,7 @@ function EditMenu() {
 									>
 										<option value="">Select an Dish</option>
 										{items
-											.filter((item) => item.Category === "Dish")
+											.filter((item) => item.Category === "Dish" || item.Category === "dish")
 											.map((item, optionIndex) => (
 												<option key={optionIndex} value={item.ItemID}>
 													{item.ChnDescription}
@@ -213,7 +213,7 @@ function EditMenu() {
 									>
 										<option value="">Select an Dish</option>
 										{items
-											.filter((item) => item.Category === "Dish")
+											.filter((item) => item.Category === "Dish" || item.Category === "dish")
 											.map((item, optionIndex) => (
 												<option key={optionIndex} value={item.ItemID}>
 													{item.ChnDescription}
@@ -242,7 +242,7 @@ function EditMenu() {
 									>
 										<option value="">Select an Dish</option>
 										{items
-											.filter((item) => item.Category === "Dish")
+											.filter((item) => item.Category === "Dish" || item.Category === "dish")
 											.map((item, optionIndex) => (
 												<option key={optionIndex} value={item.ItemID}>
 													{item.ChnDescription}
@@ -254,15 +254,16 @@ function EditMenu() {
 						</div>
 					))}
 					<button
-						type="submit"
-						className="bg-blue-500 text-white px-4 py-2 rounded sm:px-2 sm:py-1"
-					>
-						Submit
-					</button>
-				</form>
-			)}
-		</div>
-	);
+            type="submit"
+            className="bg-blue-500 text-white px-2 py-1 rounded md:px-4 md:py-2"
+          >
+            Submit
+          </button>
+        </form>
+      )}
+    </div>
+  );
+
 }
 
 export default EditMenu;

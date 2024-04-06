@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useMenuItems } from "../../contexts/MenuItemsContext";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import moment from "moment-timezone";
 
 function EditMenu() {
     const [selectedStartDate, setSelectedStartDate] = useState(new Date());
@@ -28,7 +29,9 @@ function EditMenu() {
             const date = new Date(startOfWeek);
             date.setDate(date.getDate() + i);
             dates.push(date);
-            const dateString = date.toISOString().split("T")[0];
+            const dateString = moment(date)
+            .tz("America/Los_Angeles")
+            .format("YYYY-MM-DD");
             newMenuItemsByDate[dateString] = [];
         }
 
