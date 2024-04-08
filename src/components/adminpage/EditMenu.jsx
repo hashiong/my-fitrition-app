@@ -27,7 +27,11 @@ function EditMenu() {
 			const querySnapshot = await getDocs(collection(db, "menuItems"));
 			const fetchedItems = querySnapshot.docs
 				.map((doc) => ({ id: doc.id, ...doc.data() }))
-				.sort((a, b) => a.ItemID - b.ItemID);
+				.sort((a, b) =>
+					a.ChnDescription.localeCompare(b.ChnDescription, "zh-Hans", {
+						sensitivity: "accent",
+					})
+				);
 			setItems(fetchedItems);
 		};
 
@@ -52,6 +56,7 @@ function EditMenu() {
 			return date;
 		});
 		setWeekDates(weekDates);
+		setDayDisabled(Array(5).fill(false));
 
 		const promises = weekDates.map((date) => {
 			const formattedDate = moment(date)
@@ -65,7 +70,7 @@ function EditMenu() {
 			.catch((error) => console.error("Error fetching menu data:", error));
 	}, [selectedDate]);
 
-
+	
 
 	const fetchMenuData = async (date) => {
 		const q = query(
@@ -81,7 +86,9 @@ function EditMenu() {
 				const existingDayMenu = doc
 					.data()
 					.menuItems.map((item) => item.ItemID.toString());
-				dayMenuData = existingDayMenu;
+				if(existingDayMenu.length !== 0){
+					dayMenuData = existingDayMenu;
+				}
 			});
 			return dayMenuData;
 		} catch (error) {
@@ -142,26 +149,29 @@ function EditMenu() {
 
 	return (
 		<div className="p-4 font-semibold md:p-8">
-      <div className="flex flex-col sm:flex-row items-center mb-4">
-        <label className="mr-2 mb-2 sm:mb-0">Start Date:</label>
-        <DatePicker
-          selected={selectedDate}
-          onChange={setSelectedDate}
-          filterDate={(date) => date.getDay() === 1}
-          className="text-center text-md flex-1 px-2 py-1 rounded bg-gray-200 text-gray-700 md:px-4 md:py-2"
-        />
-      </div>
-      {dayMenuSelections.length > 0 && (
-        <form onSubmit={handleFormSubmit} className="mt-4 flex flex-col gap-4 md:flex-row md:gap-2">
+			<div className="flex flex-col sm:flex-row items-center mb-4">
+				<label className="mr-2 mb-2 sm:mb-0">Start Date:</label>
+				<DatePicker
+					selected={selectedDate}
+					onChange={setSelectedDate}
+					filterDate={(date) => date.getDay() === 1}
+					className="text-center text-md flex-1 px-2 py-1 rounded bg-gray-200 text-gray-700 md:px-4 md:py-2"
+				/>
+			</div>
+			{dayMenuSelections.length > 0 && (
+				<form
+					onSubmit={handleFormSubmit}
+				>
+					<div className="mt-4 flex flex-col gap-4 md:flex-row md:gap-2">
 					{weekDates.map((date, index) => (
 						<div key={index} className="flex-1">
-							<div className="px-4 py-2 rounded text-center bg-blue-500 text-white sm:px-2 sm:py-1">
+							<div className="text-lg mb-3 px-4 py-2 rounded text-center bg-blue-500 text-white sm:px-2 sm:py-1">
 								{date.toLocaleDateString("en-US", {
 									weekday: "long",
 									month: "long",
 									day: "numeric",
 								})}
-								<div className="mt-2">
+								<div className="mt-1 text-sm">
 									<input
 										type="checkbox"
 										checked={dayDisabled[index]}
@@ -174,16 +184,19 @@ function EditMenu() {
 							{dayDisabled[index] ? (
 								<div>No Menu</div>
 							) : (
-								<div className="mt-2">
+								<div className="mt-3">
 									<select
 										value={dayMenuSelections[index][0]}
 										onChange={(event) => handleDropdownChange(index, 0, event)}
-										className="block w-full mt-1"
+										className="mb-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 										required
 									>
 										<option value="">Select an Soup</option>
 										{items
-											.filter((item) => item.Category === "Soup" || item.Category === "soup")
+											.filter(
+												(item) =>
+													item.Category === "Soup" || item.Category === "soup"
+											)
 											.map((item, optionIndex) => (
 												<option key={optionIndex} value={item.ItemID}>
 													{item.ChnDescription}
@@ -193,12 +206,15 @@ function EditMenu() {
 									<select
 										value={dayMenuSelections[index][1]}
 										onChange={(event) => handleDropdownChange(index, 1, event)}
-										className="block w-full mt-1"
+										className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 										required
 									>
 										<option value="">Select an Dish</option>
 										{items
-											.filter((item) => item.Category === "Dish" || item.Category === "dish")
+											.filter(
+												(item) =>
+													item.Category === "Dish" || item.Category === "dish"
+											)
 											.map((item, optionIndex) => (
 												<option key={optionIndex} value={item.ItemID}>
 													{item.ChnDescription}
@@ -208,12 +224,15 @@ function EditMenu() {
 									<select
 										value={dayMenuSelections[index][2]}
 										onChange={(event) => handleDropdownChange(index, 2, event)}
-										className="block w-full mt-1"
+										className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 										required
 									>
 										<option value="">Select an Dish</option>
 										{items
-											.filter((item) => item.Category === "Dish" || item.Category === "dish")
+											.filter(
+												(item) =>
+													item.Category === "Dish" || item.Category === "dish"
+											)
 											.map((item, optionIndex) => (
 												<option key={optionIndex} value={item.ItemID}>
 													{item.ChnDescription}
@@ -223,7 +242,7 @@ function EditMenu() {
 									<select
 										value={dayMenuSelections[index][3]}
 										onChange={(event) => handleDropdownChange(index, 3, event)}
-										className="block w-full mt-1"
+										className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 										required
 									>
 										{items
@@ -237,12 +256,15 @@ function EditMenu() {
 									<select
 										value={dayMenuSelections[index][4]}
 										onChange={(event) => handleDropdownChange(index, 4, event)}
-										className="block w-full mt-1"
+										className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 										required
 									>
 										<option value="">Select an Dish</option>
 										{items
-											.filter((item) => item.Category === "Dish" || item.Category === "dish")
+											.filter(
+												(item) =>
+													item.Category === "Dish" || item.Category === "dish"
+											)
 											.map((item, optionIndex) => (
 												<option key={optionIndex} value={item.ItemID}>
 													{item.ChnDescription}
@@ -253,17 +275,20 @@ function EditMenu() {
 							)}
 						</div>
 					))}
-					<button
+					
+					</div>
+					<div className="flex justify-center mt-4"> {/* Add this div wrapper */}
+          <button
             type="submit"
-            className="bg-blue-500 text-white px-2 py-1 rounded md:px-4 md:py-2"
+            className="bg-blue-500 text-white px-2 py-1 rounded md:px-4 md:py-2 tracking-4"
           >
             Submit
           </button>
-        </form>
-      )}
-    </div>
-  );
-
+        </div>
+				</form>
+			)}
+		</div>
+	);
 }
 
 export default EditMenu;

@@ -12,6 +12,7 @@
   "dependencies": {
     "firebase": "^10.8.1",
     "moment-timezone": "^0.5.45",
+    "opencc-js": "^1.0.5",
     "react": "^18.2.0",
     "react-datepicker": "^6.4.0",
     "react-dom": "^18.2.0",

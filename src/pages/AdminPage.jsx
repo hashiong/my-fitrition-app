@@ -2,7 +2,7 @@
 import { Navigate, Routes, Route } from "react-router-dom";
 import Sidebar from "../components/adminpage/SideBar";
 import MenuList from "../components/adminpage/MenuList";
-import EditMenu from "../components/adminpage/EditMenuV1";
+import EditMenu from "../components/adminpage/EditMenu";
 function AdminPage() {
 
 
