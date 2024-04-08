@@ -47,14 +47,28 @@ const MenuList = () => {
 		currentItem ? handleEditSubmit(event) : handleNewSubmit(event);
 	};
 
+	// const handleInputCategory = (event) => {
+	// 	const category = event.target.value;
+	// 	setInputCategory(category);
+	// };
+
 	// Adds a new menu item to Firestore and updates the local state
 	const handleNewSubmit = async (event) => {
 		event.preventDefault(); // Prevent default form submission behavior
 		const formData = new FormData(event.target);
-		const EnDesc = formData.get("ChnDescription") ? await translateText(formData.get("ChnDescription"), "en") : "";
-
+		const EnDesc = formData.get("ChnDescription")
+			? await translateText(formData.get("ChnDescription"), "en")
+			: "";
+		let smallestAvailableID = 1; // Start from 1 or any starting point you prefer
+		for (let i = 0; i < items.length; i++) {
+			if (items[i].ItemID === smallestAvailableID) {
+				smallestAvailableID++; // This ID is taken, check the next one
+			} else {
+				break; // Found a gap or end of the sequence
+			}
+		}
 		const newItem = {
-			ItemID: Number(formData.get("ItemID")),
+			ItemID: smallestAvailableID,
 			Category: formData.get("Category"),
 			ChnDescription: formData.get("ChnDescription"),
 			EnDescription: EnDesc,
@@ -72,8 +86,9 @@ const MenuList = () => {
 	// Updates an existing menu item in Firestore and the local state
 	const handleEditSubmit = async (event) => {
 		const formData = new FormData(event.target);
+		console.log("cate: ", formData.get("Category"))
 		const updatedItem = {
-			ItemID: Number(formData.get("ItemID")),
+			ItemID: currentItem.ItemID,
 			Category: formData.get("Category"),
 			ChnDescription: formData.get("ChnDescription"),
 			EnDescription: formData.get("EnDescription"),
@@ -165,24 +180,19 @@ const MenuList = () => {
 			<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<div>
-						<label className="block text-lg text-left font-medium text-gray-700 ">
-							Item ID
-						</label>
-						<input
-							type="text"
-							name="ItemID"
-							defaultValue={currentItem?.ItemID}
-							className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-						/>
 						<label className="mt-3 block text-lg text-left font-medium text-gray-700">
 							Category
 						</label>
-						<input
-							type="text"
-							name="Category"
+						<select
+							name = "Category"
 							defaultValue={currentItem?.Category}
-							className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-						/>
+							className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+							required
+						>
+							<option value="Dish">Dish</option>
+							<option value="Soup">Soup</option>
+							<option value="Vegetable">Vegetable</option>
+						</select>
 						<label className="mt-3 block text-lg text-left font-medium text-gray-700">
 							Chinese Description
 						</label>
