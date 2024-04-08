@@ -1,4 +1,3 @@
-import React from "react";
 import logoImage from "../../assets/logo.png";
 import phoneImage from "../../assets/phone.png";
 
@@ -28,7 +27,7 @@ const Header = () => {
               HOME
             </a>
             <a
-              href="/menu"
+              href="/"
               className="text-lg md:text-xl tracking-wide font-extrabold text-black hover:text-green-200"
             >
               MENU

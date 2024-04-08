@@ -6,7 +6,7 @@ import DatePicker from "react-datepicker";
 import moment from "moment-timezone";
 import "react-datepicker/dist/react-datepicker.css";
 
-function EditMenu() {
+function EditMenuAlt() {
   const [startDate, setStartDate] = useState(new Date());
   const [weekDates, setWeekDates] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
@@ -313,4 +313,4 @@ function EditMenu() {
   );
 }
 
-export default EditMenu;
+export default EditMenuAlt;

@@ -3,6 +3,8 @@ import { Navigate, Routes, Route } from "react-router-dom";
 import Sidebar from "../components/adminpage/SideBar";
 import MenuList from "../components/adminpage/MenuList";
 import EditMenu from "../components/adminpage/EditMenu";
+import EditMenuAlt from "../components/adminpage/EditMenuAlt";
+import SetAnnouncement from "../components/adminpage/SetAnnouncement";
 function AdminPage() {
 
 
@@ -15,6 +17,8 @@ function AdminPage() {
         <Routes>
           <Route path="/menulist" element={<MenuList />} />
           <Route path="/editmenu" element={<EditMenu />} />
+          <Route path="/editmenualt" element={<EditMenuAlt />} />
+          <Route path="/setannouncement" element={<SetAnnouncement />} />
           <Route path="*" element={<Navigate replace to="/admin/menulist" />} />
         </Routes>
       </div>

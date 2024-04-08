@@ -43,6 +43,9 @@ const Sidebar = () => {
             <Link to="/admin/editmenu" className="block p-3 hover:bg-gray-700" onClick={closeSidebar}>Edit</Link>
           </li>
           <li>
+            <Link to="/admin/setannouncement" className="block p-3 hover:bg-gray-700" onClick={closeSidebar}>Announcement</Link>
+          </li>
+          <li>
             <Link to="/login" className="block p-3 hover:bg-gray-700" onClick={signOut}>Sign Out</Link>
           </li>
         </ul>
