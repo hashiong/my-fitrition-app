@@ -20,6 +20,7 @@ function EditMenu() {
 	const { db } = useContext(FirebaseContext);
 	const [dayDisabled, setDayDisabled] = useState(Array(5).fill(false));
 	const { items, setItems } = useMenuItems();
+	const [submitted, setSubmitted] = useState(false);
 
 	// Fetch menu items only once or based on specific conditions
 	useEffect(() => {
@@ -70,8 +71,6 @@ function EditMenu() {
 			.catch((error) => console.error("Error fetching menu data:", error));
 	}, [selectedDate]);
 
-	
-
 	const fetchMenuData = async (date) => {
 		const q = query(
 			collection(db, "scheduledMenus"),
@@ -86,7 +85,7 @@ function EditMenu() {
 				const existingDayMenu = doc
 					.data()
 					.menuItems.map((item) => item.ItemID.toString());
-				if(existingDayMenu.length !== 0){
+				if (existingDayMenu.length !== 0) {
 					dayMenuData = existingDayMenu;
 				}
 			});
@@ -142,6 +141,11 @@ function EditMenu() {
 		// Execute all writes concurrently.
 		try {
 			await Promise.all(firestoreWrites);
+			setSubmitted(true);
+
+			setTimeout(() => {
+				setSubmitted(false);
+			}, 5000);
 		} catch (error) {
 			console.error("Error in batch saving menus:", error);
 		}
@@ -159,132 +163,158 @@ function EditMenu() {
 				/>
 			</div>
 			{dayMenuSelections.length > 0 && (
-				<form
-					onSubmit={handleFormSubmit}
-				>
+				<form onSubmit={handleFormSubmit}>
 					<div className="mt-4 flex flex-col gap-4 md:flex-row md:gap-2">
-					{weekDates.map((date, index) => (
-						<div key={index} className="flex-1">
-							<div className="text-lg mb-3 px-4 py-2 rounded text-center bg-blue-500 text-white sm:px-2 sm:py-1">
-								{date.toLocaleDateString("en-US", {
-									weekday: "long",
-									month: "long",
-									day: "numeric",
-								})}
-								<div className="mt-1 text-sm">
-									<input
-										type="checkbox"
-										checked={dayDisabled[index]}
-										onChange={() => handleDayDisabledChange(index)}
-										className="mr-2"
-									/>
-									Disable Menu
+						{weekDates.map((date, index) => (
+							<div key={index} className="flex-1">
+								<div className="text-lg mb-3 px-4 py-2 rounded text-center bg-blue-500 text-white sm:px-2 sm:py-1">
+									{date.toLocaleDateString("en-US", {
+										weekday: "long",
+										month: "long",
+										day: "numeric",
+									})}
+									<div className="mt-1 text-sm">
+										<input
+											type="checkbox"
+											checked={dayDisabled[index]}
+											onChange={() => handleDayDisabledChange(index)}
+											className="mr-2"
+										/>
+										Disable Menu
+									</div>
 								</div>
+								{dayDisabled[index] ? (
+									<div>No Menu</div>
+								) : (
+									<div className="mt-3">
+										<select
+											value={dayMenuSelections[index][0]}
+											onChange={(event) =>
+												handleDropdownChange(index, 0, event)
+											}
+											className="mb-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+											required
+										>
+											<option value="">Select an Soup</option>
+											{items
+												.filter(
+													(item) =>
+														item.Category === "Soup" || item.Category === "soup"
+												)
+												.map((item, optionIndex) => (
+													<option key={optionIndex} value={item.ItemID}>
+														{item.ChnDescription}
+													</option>
+												))}
+										</select>
+										<select
+											value={dayMenuSelections[index][1]}
+											onChange={(event) =>
+												handleDropdownChange(index, 1, event)
+											}
+											className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+											required
+										>
+											<option value="">Select an Dish</option>
+											{items
+												.filter(
+													(item) =>
+														item.Category === "Dish" || item.Category === "dish"
+												)
+												.map((item, optionIndex) => (
+													<option key={optionIndex} value={item.ItemID}>
+														{item.ChnDescription}
+													</option>
+												))}
+										</select>
+										<select
+											value={dayMenuSelections[index][2]}
+											onChange={(event) =>
+												handleDropdownChange(index, 2, event)
+											}
+											className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+											required
+										>
+											<option value="">Select an Dish</option>
+											{items
+												.filter(
+													(item) =>
+														item.Category === "Dish" || item.Category === "dish"
+												)
+												.map((item, optionIndex) => (
+													<option key={optionIndex} value={item.ItemID}>
+														{item.ChnDescription}
+													</option>
+												))}
+										</select>
+										<select
+											value={dayMenuSelections[index][3]}
+											onChange={(event) =>
+												handleDropdownChange(index, 3, event)
+											}
+											className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+											required
+										>
+											{items
+												.filter((item) => item.ItemID === 1)
+												.map((item, optionIndex) => (
+													<option key={optionIndex} value={item.ItemID}>
+														{item.ChnDescription}
+													</option>
+												))}
+										</select>
+										<select
+											value={dayMenuSelections[index][4]}
+											onChange={(event) =>
+												handleDropdownChange(index, 4, event)
+											}
+											className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+											required
+										>
+											<option value="">Select an Dish</option>
+											{items
+												.filter(
+													(item) =>
+														item.Category === "Dish" || item.Category === "dish"
+												)
+												.map((item, optionIndex) => (
+													<option key={optionIndex} value={item.ItemID}>
+														{item.ChnDescription}
+													</option>
+												))}
+										</select>
+									</div>
+								)}
 							</div>
-							{dayDisabled[index] ? (
-								<div>No Menu</div>
-							) : (
-								<div className="mt-3">
-									<select
-										value={dayMenuSelections[index][0]}
-										onChange={(event) => handleDropdownChange(index, 0, event)}
-										className="mb-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-										required
-									>
-										<option value="">Select an Soup</option>
-										{items
-											.filter(
-												(item) =>
-													item.Category === "Soup" || item.Category === "soup"
-											)
-											.map((item, optionIndex) => (
-												<option key={optionIndex} value={item.ItemID}>
-													{item.ChnDescription}
-												</option>
-											))}
-									</select>
-									<select
-										value={dayMenuSelections[index][1]}
-										onChange={(event) => handleDropdownChange(index, 1, event)}
-										className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-										required
-									>
-										<option value="">Select an Dish</option>
-										{items
-											.filter(
-												(item) =>
-													item.Category === "Dish" || item.Category === "dish"
-											)
-											.map((item, optionIndex) => (
-												<option key={optionIndex} value={item.ItemID}>
-													{item.ChnDescription}
-												</option>
-											))}
-									</select>
-									<select
-										value={dayMenuSelections[index][2]}
-										onChange={(event) => handleDropdownChange(index, 2, event)}
-										className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-										required
-									>
-										<option value="">Select an Dish</option>
-										{items
-											.filter(
-												(item) =>
-													item.Category === "Dish" || item.Category === "dish"
-											)
-											.map((item, optionIndex) => (
-												<option key={optionIndex} value={item.ItemID}>
-													{item.ChnDescription}
-												</option>
-											))}
-									</select>
-									<select
-										value={dayMenuSelections[index][3]}
-										onChange={(event) => handleDropdownChange(index, 3, event)}
-										className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-										required
-									>
-										{items
-											.filter((item) => item.ItemID === 1)
-											.map((item, optionIndex) => (
-												<option key={optionIndex} value={item.ItemID}>
-													{item.ChnDescription}
-												</option>
-											))}
-									</select>
-									<select
-										value={dayMenuSelections[index][4]}
-										onChange={(event) => handleDropdownChange(index, 4, event)}
-										className="mt-1 bg-gray-50 border border-gray-300 text-gray-900 text rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-										required
-									>
-										<option value="">Select an Dish</option>
-										{items
-											.filter(
-												(item) =>
-													item.Category === "Dish" || item.Category === "dish"
-											)
-											.map((item, optionIndex) => (
-												<option key={optionIndex} value={item.ItemID}>
-													{item.ChnDescription}
-												</option>
-											))}
-									</select>
-								</div>
-							)}
-						</div>
-					))}
-					
+						))}
 					</div>
-					<div className="flex justify-center mt-4"> {/* Add this div wrapper */}
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-2 py-1 rounded md:px-4 md:py-2 tracking-4"
-          >
-            Submit
-          </button>
-        </div>
+					<div className="flex justify-center mt-4">
+						<button
+							type="submit"
+							className="bg-blue-500 text-white px-2 py-1 rounded md:px-4 md:py-2 tracking-4"
+						>
+							Submit
+						</button>
+					</div>
+					{submitted && (
+						<div
+							className="bg-green-100 border border-green-400 text-green-700 m-4 px-4 py-3 rounded relative"
+							role="alert"
+						>
+							<strong className="font-bold">Menu Saved Successfully!</strong>
+							<span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+								<svg
+									className="fill-current h-6 w-6 text-green-500"
+									role="button"
+									xmlns="http://www.w3.org/2000/svg"
+									viewBox="0 0 20 20"
+								>
+									<title>Close</title>
+									<path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+								</svg>
+							</span>
+						</div>
+					)}
 				</form>
 			)}
 		</div>
